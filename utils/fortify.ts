@@ -11,11 +11,26 @@ export declare type TContinueEvent = {
   privateKeyId: string;
 };
 
+const makeRandomEngineName = (length: number) => {
+  var result = '';
+  var characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 export const mySigner = async (
   event: CustomEvent<TContinueEvent>,
-  textToSign: string
-): Promise<string> => {
+  textToSign: string,
+  setText: (item:string)=>void
+): Promise<any> => {
   try {
+
+    const engineName = makeRandomEngineName(8); // unique name for each operation
+
         let provider: any = await event.detail.server.getCrypto(
       event.detail.providerId
     );
@@ -23,7 +38,7 @@ export const mySigner = async (
     provider.sign = provider.subtle.sign.bind(provider.subtle);
 
     pkijs.setEngine(
-      "newEngine",
+      engineName,
       provider,
       new pkijs.CryptoEngine({
         name: "",
@@ -76,7 +91,8 @@ export const mySigner = async (
     });
     const result = cms.toSchema().toBER(false);
 
-    return formatText(result);
+    // return formatText(result);
+    setText(formatText(result))
   } catch (error) {
     alert("Failed to sign");
     console.error(error);

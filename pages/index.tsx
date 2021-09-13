@@ -1,12 +1,25 @@
 import { Button, Grid, Paper, TextField } from "@material-ui/core";
 import { PeculiarFortifyCertificates } from "@peculiar/fortify-webcomponents-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { mySigner, TContinueEvent } from "../utils/fortify";
 
 export default function Home() {
   const [certVisible, setCertVisible] = useState(false);
   const [textToSign, setTextToSign] = useState("");
   const [textSigned, setTextSigned] = useState("");
+
+  const [isNotDefined, setIsNotDefined] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsNotDefined(true);
+    }
+  }, [isNotDefined]);
+
+  if (!isNotDefined) {
+    return <div />;
+  }
+
 
   const handlerSign = () => {
     setCertVisible(!certVisible);
@@ -17,9 +30,10 @@ export default function Home() {
   };
 
   const handlerContinue = async (e: CustomEvent<TContinueEvent>) => {
-    const textS = await mySigner(e, textToSign);
+    await mySigner(e, textToSign, setTextSigned);
 
-    setTextSigned(textS);
+    console.log(textSigned)
+    // setTextSigned(textS);
 
     setCertVisible(false);
   };
@@ -65,7 +79,8 @@ export default function Home() {
                 Sign
               </Button>
             )}
-            {certVisible && (
+      
+              <div id="Display" style={{display: certVisible ? '' : 'none'}}>
               <PeculiarFortifyCertificates
                 filters={{
                   onlyWithPrivateKey: true,
@@ -77,7 +92,9 @@ export default function Home() {
                   handlerContinue(e);
                 }}
               />
-            )}
+              
+              </div>
+
           </Grid>
           <Grid item sm={4}>
             <TextField
