@@ -86,6 +86,7 @@ export default function Home() {
                   onlyWithPrivateKey: true,
                   keyUsage: ["digitalSignature"],
                 }}
+                language="es"
                 hideFooter={true}
                 onCancel={(e) => handlerCancel(e)}
                 onContinue={(e) => {
